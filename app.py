@@ -10,7 +10,8 @@ from flask import Flask, render_template, request
 # config = dotenv_values(".env")
 
 config = os.getenv("OPENAI_API_KEY")
-
+app.logger.info(config)
+# print(config)
 openai.api_key = config
 
 # openai.api_key = config["OPENAI_API_KEY"]
