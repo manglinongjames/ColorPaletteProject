@@ -10,7 +10,7 @@ from flask import Flask, render_template, request
 # config = dotenv_values(".env")
 
 config = os.getenv("OPENAI_API_KEY")
-app.logger.info(config)
+# app.logger.info(config)
 # print(config)
 openai.api_key = config
 
@@ -26,29 +26,35 @@ app = Flask(__name__,
 
 #openai endpoint
 def get_colors(msg):
-    prompt=f"""
-    You are a color palette generating assistant that responds to text prompts for color palettes
-    You should generate a color palettes that fit the theme, mood, or instructions in the prompt.
-    The palettes should be between 2 and 8 
+    # prompt=f"""
+    # You are a color palette generating assistant that responds to text prompts for color palettes
+    # You should generate a color palettes that fit the theme, mood, or instructions in the prompt.
+    # The palettes should be between 2 and 8 
     
-    Q: Convert the following verbal description of a color palette into a list of colors: The Mediterranean Sea
-    A: ["F006699","#66CCCC","#FF0E68C","#008000","#F08080"]
+    # Q: Convert the following verbal description of a color palette into a list of colors: The Mediterranean Sea
+    # A: ["F006699","#66CCCC","#FF0E68C","#008000","#F08080"]
 
-    Q: Convert the following verbal description of a color palette into a list of colors: sage, nature, earth
-    A: ["#EDF1D6","#9DC08B","F809966","#405130B"]
+    # Q: Convert the following verbal description of a color palette into a list of colors: sage, nature, earth
+    # A: ["#EDF1D6","#9DC08B","F809966","#405130B"]
     
-    Desired Format: a JSON array of hexadecimal color codes
+    # Desired Format: a JSON array of hexadecimal color codes
 
-    Q: Convert the following verbal description of a color palette into a list of colors: {msg}
-    A:
-    """
+    # Q: Convert the following verbal description of a color palette into a list of colors: {msg}
+    # A:
+    # """
+
+    messages = [
+        {"role": "system", "content": "You are a color palette generating assistant that responds to text prompts for color palettes. You should generate a color palettes that fit the theme, mood, or instructions in the prompt. The palettes should be between 2 and 8. Desired Format: a JSON array of hexadecimal color codes"},
+        {"role": "user", "content": "Convert the following verbal description of a color palette into a list of colors: The Mediterranean Sea"},
+        {"role": "assistant", "content": '["F006699","#66CCCC","#FF0E68C","#008000","#F08080"]'},
+        {"role": "user", "content": "Convert the following verbal description of a color palette into a list of colors: sage, nature, earth"},
+        {"role": "assistant", "content": '["#EDF1D6","#9DC08B","F809966","#405130B"]'},
+        {"role": "user", "content": f"Convert the following verbal description of a color palette into a list of colors: {msg}"}
+        
+    ]
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        messages=[
-            {
-                "role": "user", "content": prompt
-            }
-        ],
+        messages=messages,
     )
 
     colors = json.loads(response.choices[0]["message"]["content"])
@@ -57,8 +63,8 @@ def get_colors(msg):
 
 @app.route("/palette", methods=["POST"])
 def  prompt_to_palette():
-    app.logger.info("HIT THE POST REQUEST ROUTE")
-    app.logger.info(request.form.get("query"))
+    # app.logger.info("HIT THE POST REQUEST ROUTE")
+    # app.logger.info(request.form.get("query"))
 
     query = request.form.get("query")
     colors = get_colors(query)
